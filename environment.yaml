@@ -1,0 +1,18 @@
+# conda env create --file environment.yaml --no-default-packages
+# conda remove -n vscode_extension --all
+name: vscode_extension
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+ - mlflow==2.16.*
+ - python==3.11
+ - numpy==1.23.5
+ - pandas==1.5.3
+ - scikit-learn==1.3.0
+ - xgboost==2.0.3
+ - optuna==4.0.0
+ - ipykernel==6.29.*
+ - pip
+ - pip:
+    - databricks-connect==14.3.*

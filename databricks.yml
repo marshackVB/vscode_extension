@@ -1,0 +1,40 @@
+# This is a Databricks asset bundle definition for vs_code_extension.
+# The Databricks extension requires databricks.yml configuration file.
+# See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
+
+# To execute a bundle
+# databricks bundle validate --profile DEFAULT
+bundle:
+  name: vscode_extension
+   
+resources:
+  jobs: 
+    training:
+        name: training
+        git_source:
+                git_branch: main
+                git_provider: gitHub
+                git_url: https://github.com/marshackVB/vscode_extension.git
+        job_clusters:
+          - job_cluster_key: job_cluster
+            new_cluster:
+              spark_version: 15.4.x-cpu-ml-scala2.12
+              node_type_id: i3.xlarge
+              data_security_mode: SINGLE_USER
+              runtime_engine: STANDARD
+              num_workers: 1
+
+targets:
+  python_task:
+    workspace:
+      host: https://e2-demo-field-eng.cloud.databricks.com
+    resources:
+      jobs: 
+        training:
+            name: ptyhon_task_training
+            tasks:
+              - task_key: training
+                job_cluster_key: job_cluster
+                spark_python_task:
+                  python_file: vscode_dabs/main/train.py
+                  source: GIT
