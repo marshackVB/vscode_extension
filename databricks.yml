@@ -36,5 +36,5 @@ targets:
               - task_key: training
                 job_cluster_key: job_cluster
                 spark_python_task:
-                  python_file: vscode_dabs/main/train.py
+                  python_file: main/train.py
                   source: GIT
