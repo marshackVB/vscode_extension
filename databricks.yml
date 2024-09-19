@@ -14,6 +14,9 @@ variables:
   delta_location:
     description: Feature table Delta location
     default: 'main.default.titanic_features'
+  dbfs_csv_folder:
+    description: Folder that houses the raw data csv file in Databricks
+    default: dbfs:/Shared/temp_data
    
 # Resources that will be deployed in each target
 resources:
@@ -58,5 +61,6 @@ targets:
                 spark_python_task:
                   python_file: main/train.py
                   source: GIT
-                  parameters: ["--experiment_name", "{${var.experiment_name}}",
-                               "--delta_location", "{${var.delta_location}}"] 
+                  parameters: ["--experiment_name", "${var.experiment_name}",
+                               "--delta_location", "${var.delta_location}",
+                               "--dbfs_csv_folder", "${var.dbfs_csv_folder}"] 

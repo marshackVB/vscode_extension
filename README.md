@@ -14,22 +14,32 @@ Some considerations...
 
 To run this demo...
  - Installed and configured [Databricks CLI](https://docs.databricks.com/en/dev-tools/cli/index.html)
+ - Install and configure the [Databricks Extension for Visual Studio Code](https://docs.databricks.com/en/dev-tools/vscode-ext/install.html)
  - Clone the repository
  - Copy the training data csv file, data/titanic_train.csv, to a UC volume or the DBS. For example...   
     ```
     databricks fs cp titanic_train.csv dbfs:/Shared/temp_data/titanic_train.csv
     ```
+ - Create a local conda environment
+    ```
+    conda env create --file environment.yaml --no-default-packages
+    ```
+ - Open the project in VS Code, select the Databricks icon on the left hand side, select Select a bundle target and choose spark_python_task.
+ - Select the login profile and choose the profile created when configuring the Databricks CLI.
+ - Click, 'Select a cluster' and either choose and existing cluster or provision a new one.
+ - Select Activate Environment and choose the conda environment previously created.
 
 
 
 
-Some helpful links: 
-Databricks Connect
+Some helpful links:   
+
+Databricks Connect   
     - [Documentation on extension and use with Databricks Connect](https://docs.databricks.com/en/dev-tools/vscode-ext/notebooks.html#run-and-debug-notebook-cells-with-databricks-connect-using-the-databricks-extension-for-visual-studio-code)  
 
 DABs  
-    - [Configuring databricks asset bundle files](https://docs.databricks.com/en/dev-tools/bundles/settings.html#databricks-asset-bundle-configurations)  
-        - See section on [mappings definitions](https://docs.databricks.com/en/dev-tools/bundles/settings.html#mappings)
+    - [Configuring databricks asset bundle files](https://docs.databricks.com/en/dev-tools/bundles/settings.html#databricks-asset-bundle-configurations)    
+        - See section on [mappings definitions](https://docs.databricks.com/en/dev-tools/bundles/settings.html#mappings)  
     - [Variable substitution with DABs](https://docs.databricks.com/en/dev-tools/bundles/variables.html#set-variable-value)
 
 Databricks API (governs resource configuration in DABs)  

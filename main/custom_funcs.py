@@ -8,14 +8,11 @@ from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import ColumnTransformer
 
-
 spark = SparkSession.builder.getOrCreate()
 
-
-def get_spark_dataframe():
+def get_spark_dataframe(dbfs_csv_folder):
   """Load sample .csv file from Repo into a Spark DataFrame"""
 
-  dbfs_csv_folder = "dbfs:/Shared/temp_data"
   columns_and_types = [('PassengerId', StringType()),
                        ('Survived', IntegerType()), 
                        ('Pclass', StringType()),

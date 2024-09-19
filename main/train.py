@@ -21,21 +21,20 @@ config = vars(args)
 mlflow.set_tracking_uri("databricks")
 mlflow.set_experiment(config['experiment_name'])
 
-raw_data = get_spark_dataframe()
+raw_data = get_spark_dataframe(config["dbfs_csv_folder"])
 features = transform_data(raw_data)
 
 features.write.mode('overwrite').format('delta').saveAsTable(config['delta_location'])
 training_df = spark.table(config['delta_location']).toPandas()
-
 
 with mlflow.start_run(run_name='xgboost') as run:
 
     run_id = run.info.run_id
 
     mlflow.autolog(log_input_examples=True,
-                 log_model_signatures=True,
-                 log_models=True,
-                 silent=True)
+                   log_model_signatures=True,
+                   log_models=True,
+                   silent=True)
     
     label = 'Survived'
     features = [col for col in training_df.columns if col not in [label, 'PassengerId']]
@@ -51,5 +50,13 @@ with mlflow.start_run(run_name='xgboost') as run:
 
     classification_pipeline = Pipeline([("preprocess", preprocessing_pipeline), ("classifier", model)])
     classification_pipeline.fit(X_train, y_train)
+
+    logged_model = f'runs:/{run_id}/model'
+    eval_features_and_labels = pd.concat([X_val, y_val], axis=1)
+
+    mlflow.evaluate(logged_model, 
+                  data=eval_features_and_labels, 
+                  targets="Survived", 
+                  model_type="classifier")
 
     print(f"Training model with run id: {run_id}")
