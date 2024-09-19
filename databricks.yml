@@ -6,8 +6,20 @@
 # databricks bundle validate --profile DEFAULT
 bundle:
   name: vscode_extension
+
+variables:
+  experiment_name:
+    description: Experiment name for model training
+    default: '/Users/${workspace.current_user.userName}/vscode_extension_experiment'
+  delta_location:
+    description: Feature table Delta location
+    default: 'main.default.titanic_features'
    
+# Resources that will be deployed in each target
 resources:
+  experiments:
+    experiment:
+      name: ${var.experiment_name}
   jobs: 
     training:
         name: training
@@ -32,16 +44,19 @@ resources:
                 }
 
 targets:
-  python_task:
+  spark_python_task:
     workspace:
-      host: https://e2-demo-field-eng.cloud.databricks.com
+      host: https://e2-demo-field-eng.cloud.databricks.com/
+    # Extended the job configuration referenced above
     resources:
       jobs: 
         training:
-            name: python_task_training
+            name: training
             tasks:
-              - task_key: training
+              - task_key: spark_python_task
                 job_cluster_key: job_cluster
                 spark_python_task:
                   python_file: main/train.py
                   source: GIT
+                  parameters: ["--experiment_name", "{${var.experiment_name}}",
+                               "--delta_location", "{${var.delta_location}}"] 

@@ -1,4 +1,5 @@
 import mlflow
+import argparse
 import pandas as pd
 import xgboost as xgb
 from sklearn.model_selection import train_test_split
@@ -7,21 +8,25 @@ from pyspark.sql import SparkSession
 
 from main.custom_funcs import get_spark_dataframe, transform_data, get_pipeline
 
-mlflow.set_tracking_uri("databricks")
-mlflow.set_experiment("/Shared/marshall_carter")
-
-
 spark = SparkSession.builder.getOrCreate()
 
+parser = argparse.ArgumentParser(description="Model training parameters",
+                                 formatter_class=argparse.ArgumentDefaultsHelpFormatter)   
+parser.add_argument("--experiment_name", type=str, help="MLflow experiment name") 
+parser.add_argument("--delta_location", type=str, help="Features Delta table location") 
+
+args = parser.parse_args()
+config = vars(args)
+
+mlflow.set_tracking_uri("databricks")
+mlflow.set_experiment(config['experiment_name'])
 
 raw_data = get_spark_dataframe()
 features = transform_data(raw_data)
 
-delta_location = 'main.default.mlc_titanic_features'
-features.write.mode('overwrite').format('delta').saveAsTable(delta_location)
+features.write.mode('overwrite').format('delta').saveAsTable(config['delta_location'])
+training_df = spark.table(config['delta_location']).toPandas()
 
-training_df = spark.table(delta_location).toPandas()
-training_df.head()
 
 with mlflow.start_run(run_name='xgboost') as run:
 
