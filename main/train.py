@@ -5,7 +5,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from pyspark.sql import SparkSession
 
-from sample_vs_code_project.main.custom_funcs import get_spark_dataframe, transform_data, get_pipeline
+from vscode_extension.main.custom_funcs import get_spark_dataframe, transform_data, get_pipeline
 
 mlflow.set_tracking_uri("databricks")
 mlflow.set_experiment("/Shared/marshall_carter")

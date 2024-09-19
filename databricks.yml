@@ -31,7 +31,7 @@ targets:
     resources:
       jobs: 
         training:
-            name: ptyhon_task_training
+            name: python_task_training
             tasks:
               - task_key: training
                 job_cluster_key: job_cluster
