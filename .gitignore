@@ -1,3 +1,7 @@
 
 .databricks
-scratch/
+vscode_extension.egg-info
+delete_setup.py
+build/
+dist/
+

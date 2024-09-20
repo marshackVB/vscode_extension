@@ -2,10 +2,16 @@
 # The Databricks extension requires databricks.yml configuration file.
 # See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
 
-# To execute a bundle
+# Bundle validation, deployment, and run commands
 # databricks bundle validate --profile DEFAULT
+# databricks bundle deploy -t spark_python_task --profile DEFAULT
+# databricks bundle run train --profile DEFAULT
 bundle:
   name: vscode_extension
+
+workspace:
+  host: https://e2-demo-field-eng.cloud.databricks.com/
+  profile: DEFAULT
 
 variables:
   experiment_name:
@@ -22,14 +28,10 @@ variables:
 resources:
   experiments:
     experiment:
-      name: ${var.experiment_name}
+      name: ${var.experiment_name}.${bundle.target}
   jobs: 
-    training:
+    train:
         name: training
-        git_source:
-                git_branch: main
-                git_provider: gitHub
-                git_url: https://github.com/marshackVB/vscode_extension.git
         job_clusters:
           - job_cluster_key: job_cluster
             new_cluster:
@@ -48,13 +50,15 @@ resources:
 
 targets:
   spark_python_task:
-    workspace:
-      host: https://e2-demo-field-eng.cloud.databricks.com/
     # Extended the job configuration referenced above
     resources:
       jobs: 
-        training:
+        train:
             name: training
+            git_source:
+                git_branch: main
+                git_provider: gitHub
+                git_url: https://github.com/marshackVB/vscode_extension.git
             tasks:
               - task_key: spark_python_task
                 job_cluster_key: job_cluster
@@ -64,3 +68,26 @@ targets:
                   parameters: ["--experiment_name", "${var.experiment_name}",
                                "--delta_location", "${var.delta_location}",
                                "--dbfs_csv_folder", "${var.dbfs_csv_folder}"] 
+
+  python_wheel_task:
+    # https://docs.databricks.com/en/dev-tools/bundles/python-wheel.html
+    resources:
+      jobs: 
+        train:
+            name: training
+            tasks:
+              - task_key: python_wheel_task
+                # To run the job on an existing, interactive cluster
+                existing_cluster_id: "0920-204155-vpwxm182"
+                #job_cluster_key: job_cluster
+                python_wheel_task:
+                  package_name: vscode_extension
+                  entry_point: train
+                  named_parameters: {"experiment_name": "${var.experiment_name}",
+                                     "delta_location": "${var.delta_location}",
+                                     "dbfs_csv_folder": "${var.dbfs_csv_folder}"}
+                libraries:
+              # By default we just include the .whl file generated for the package_deployment package.
+              # See https://docs.databricks.com/dev-tools/bundles/library-dependencies.html
+              # for more information on how to add other libraries.
+                - whl: dist/*.whl
